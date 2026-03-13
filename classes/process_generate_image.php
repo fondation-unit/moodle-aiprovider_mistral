@@ -16,9 +16,9 @@
 
 namespace aiprovider_mistral;
 
-use core\http_client;
 use core_ai\ai_image;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -66,7 +66,7 @@ class process_generate_image extends abstract_processor {
     }
 
     /**
-     * Create a Mistral image generation agent and return its ID.
+     * Create an image generation agent and return its ID.
      *
      * The agent ID is cached in Moodle's plugin config to avoid creating
      * a new agent on every request, which would quickly exhaust API rate limits.
@@ -82,7 +82,7 @@ class process_generate_image extends abstract_processor {
             return $cachedagentid;
         }
 
-        $client = \core\di::get(http_client::class);
+        $client = $this->client;
         $modelsettings = $this->get_model_settings();
 
         $body = json_encode([
@@ -136,12 +136,11 @@ class process_generate_image extends abstract_processor {
         global $CFG;
         require_once($CFG->dirroot . '/ai/provider/mistral/lib.php');
 
-        $client = \core\di::get(http_client::class);
-
-        $prompt  = $this->action->get_configuration('prompttext');
-        $size    = $this->calculate_size($this->action->get_configuration('aspectratio'));
+        $client = $this->client;
+        $prompt = $this->action->get_configuration('prompttext');
+        $size = $this->calculate_size($this->action->get_configuration('aspectratio'));
         $quality = $this->action->get_configuration('quality');
-        $style   = $this->action->get_configuration('style');
+        $style = $this->action->get_configuration('style');
 
         $enrichedprompt = "{$prompt}. Style: {$style}. Quality: {$quality}. Size: {$size}.";
 
@@ -194,12 +193,27 @@ class process_generate_image extends abstract_processor {
      * @return string|null Raw binary content, or null on failure.
      */
     private function get_file_content(string $fileid): ?string {
+        global $CFG;
+        require_once($CFG->dirroot . '/ai/provider/mistral/lib.php');
+
         $apikey = $this->provider->config['apikey'];
         $endpoint = AIPROVIDER_MISTRAL_FILES_ENDPOINT . "/{$fileid}/content";
 
-        $response = \aiprovider_mistral\helper::get_request($apikey, $endpoint);
-        if (!$response || $response->getStatusCode() !== 200) {
-            return [];
+        try {
+            $response = $this->client->get($endpoint, [
+                'headers' => [
+                    'Authorization' => "Bearer {$apikey}",
+                    'Accept'        => 'application/json',
+                ],
+                RequestOptions::HTTP_ERRORS => false,
+            ]);
+        } catch (\Throwable $e) {
+            unset($e);
+            return null;
+        }
+
+        if ($response->getStatusCode() !== 200) {
+            return null;
         }
 
         return $response->getBody()->getContents();
