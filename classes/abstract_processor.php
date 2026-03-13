@@ -17,6 +17,7 @@
 namespace aiprovider_mistral;
 
 use core_ai\process_base;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
@@ -32,6 +33,20 @@ use Psr\Http\Message\UriInterface;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class abstract_processor extends process_base {
+    /** @var Client The HTTP client used to send requests to the Mistral API. */
+    protected Client $client;
+
+    /**
+     * Constructor.
+     *
+     * @param \core_ai\provider $provider The provider instance.
+     * @param \core_ai\aiactions\base $action The action to process.
+     */
+    public function __construct(\core_ai\provider $provider, \core_ai\aiactions\base $action) {
+        parent::__construct($provider, $action);
+        $this->client = new Client();
+    }
+
     /**
      * Get the endpoint URI.
      *
@@ -109,11 +124,9 @@ abstract class abstract_processor extends process_base {
         $request = $this->provider->add_authentication_headers($request);
         $request = $request->withUri($this->get_endpoint());
 
-        $client = new \GuzzleHttp\Client();
-
         try {
             // Call the external AI service.
-            $response = $client->send($request, [
+            $response = $this->client->send($request, [
                 RequestOptions::HTTP_ERRORS => false,
             ]);
         } catch (RequestException $e) {
