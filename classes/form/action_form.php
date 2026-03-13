@@ -72,8 +72,10 @@ class action_form extends action_settings_form {
 
     #[\Override]
     public function set_data($data): void {
-        if (!empty($data['modelextraparams'])) {
-            $data['modelextraparams'] = json_encode(json_decode($data['modelextraparams']), JSON_PRETTY_PRINT);
+        $extra = $data->modelextraparams ?? null;
+
+        if (!empty($extra)) {
+            $data->modelextraparams = json_encode(json_decode($extra), JSON_PRETTY_PRINT);
         }
         parent::set_data($data);
     }
@@ -83,8 +85,8 @@ class action_form extends action_settings_form {
         $data = parent::get_data();
 
         if (isset($data->model)) {
-            if ($data->modeltemplate === 'custom') {
-                $data->modelsettings['custom']['modelextraparams'] = $data->modelextraparams;
+            if (($data->modeltemplate ?? '') === 'custom') {
+                $data->modelsettings['custom']['modelextraparams'] = $data->modelextraparams ?? '';
             } else {
                 $modelclass = helper::get_model_class($data->model);
                 if ($modelclass) {
