@@ -86,14 +86,14 @@ class process_generate_image extends abstract_processor {
         $modelsettings = $this->get_model_settings();
 
         $body = json_encode([
-            'model'           => $this->get_model(),
-            'name'            => get_string('action:generate_image:agentname', 'aiprovider_mistral'),
-            'description'     => get_string('action:generate_image:agentdescription', 'aiprovider_mistral'),
-            'instructions'    => $this->get_system_instruction(),
-            'tools'           => [['type' => 'image_generation']],
+            'model' => $this->get_model(),
+            'name' => get_string('action:generate_image:agentname', 'aiprovider_mistral'),
+            'description' => get_string('action:generate_image:agentdescription', 'aiprovider_mistral'),
+            'instructions' => $this->get_system_instruction(),
+            'tools' => [['type' => 'image_generation']],
             'completion_args' => (object) array_filter([
                 'temperature' => $modelsettings['temperature'] ?? null,
-                'top_p'       => $modelsettings['top_p'] ?? null,
+                'top_p' => $modelsettings['top_p'] ?? null,
             ], fn($v) => $v !== null),
         ]);
 
@@ -145,8 +145,8 @@ class process_generate_image extends abstract_processor {
         $enrichedprompt = "{$prompt}. Style: {$style}. Quality: {$quality}. Size: {$size}.";
 
         $body = json_encode([
-            'inputs'   => $enrichedprompt,
-            'stream'   => false,
+            'inputs' => $enrichedprompt,
+            'stream' => false,
             'agent_id' => $agentid,
         ]);
 
@@ -203,7 +203,7 @@ class process_generate_image extends abstract_processor {
             $response = $this->client->get($endpoint, [
                 'headers' => [
                     'Authorization' => "Bearer {$apikey}",
-                    'Accept'        => 'application/json',
+                    'Accept' => 'application/json',
                 ],
                 RequestOptions::HTTP_ERRORS => false,
             ]);
@@ -230,16 +230,18 @@ class process_generate_image extends abstract_processor {
      */
     private function calculate_size(string $ratio): string {
         return match ($ratio) {
-            'square'    => '1024x1024',
+            'square' => '1024x1024',
             'landscape' => '1792x1024',
-            'portrait'  => '1024x1792',
-            default     => throw new \coding_exception('Invalid aspect ratio: ' . $ratio),
+            'portrait' => '1024x1792',
+            default => throw new \coding_exception('Invalid aspect ratio: ' . $ratio),
         };
     }
 
     /**
-     * create_request_object() is required by abstract_processor but unused here
+     * This method is required by abstract_processor but is intentionally unused,
      * because query_ai_api() is overridden.
+     *
+     * The parent class normally expects a userid, which we don't need with Mistral API.
      */
     #[\Override]
     protected function create_request_object(): RequestInterface {
@@ -252,15 +254,23 @@ class process_generate_image extends abstract_processor {
         $fileid = null;
         $revisedprompt = null;
 
-        foreach (($bodyobj->outputs ?? []) as $output) {
-            if (($output->type ?? '') === 'message.output') {
-                foreach (($output->content ?? []) as $block) {
-                    if (($block->type ?? '') === 'tool_file' && ($block->tool ?? '') === 'image_generation') {
-                        $fileid = $block->file_id ?? null;
-                    }
-                    if (($block->type ?? '') === 'text') {
-                        $revisedprompt = $block->text ?? null;
-                    }
+        // Iterate through all outputs returned by the agent.
+        foreach ($bodyobj->outputs ?? [] as $output) {
+            // Only process outputs that contain message content.
+            if (($output->type ?? null) !== 'message.output') {
+                continue;
+            }
+            // Inspect each block within the message content.
+            foreach ($output->content ?? [] as $block) {
+                $type = $block->type ?? null;
+                // The generated file identifier.
+                if ($type === 'tool_file' && ($block->tool ?? null) === 'image_generation') {
+                    $fileid = $block->file_id ?? null;
+                    continue;
+                }
+                // The text block containing the revised prompt produced by the model.
+                if ($type === 'text') {
+                    $revisedprompt = $block->text ?? null;
                 }
             }
         }

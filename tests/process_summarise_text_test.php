@@ -82,8 +82,7 @@ final class process_summarise_text_test extends \advanced_testcase {
     /**
      * Create a mocked Guzzle client and inject it via reflection into the processor.
      *
-     * Because Mistral uses raw GuzzleHttp\Client (bypassing Moodle's DI http_client),
-     * we use GuzzleHttp's MockHandler to intercept requests.
+     * Mistral uses raw GuzzleHttp\Client, so we use GuzzleHttp's MockHandler to intercept requests.
      * The $client property is defined on abstract_processor, so we reflect on that class.
      *
      * @param process_summarise_text $processor The processor to inject the mock into.

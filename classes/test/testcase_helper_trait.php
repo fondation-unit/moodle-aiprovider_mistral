@@ -41,11 +41,11 @@ trait testcase_helper_trait {
         $manager = \core\di::get(\core_ai\manager::class);
 
         $config = [
-            'apikey'                 => 'testapikey123',
-            'enableuserratelimit'    => true,
-            'userratelimit'          => 1,
-            'enableglobalratelimit'  => true,
-            'globalratelimit'        => 1,
+            'apikey' => 'testapikey123',
+            'enableuserratelimit' => true,
+            'userratelimit' => 1,
+            'enableglobalratelimit' => true,
+            'globalratelimit' => 1,
         ];
 
         // Choose the correct default endpoint based on the action being tested.
@@ -61,7 +61,7 @@ trait testcase_helper_trait {
         $defaultactionconfig = [
             $actionclass => [
                 'settings' => [
-                    'model'    => $defaultmodel,
+                    'model' => $defaultmodel,
                     'endpoint' => $defaultendpoint,
                 ],
             ],

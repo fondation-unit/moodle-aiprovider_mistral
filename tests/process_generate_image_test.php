@@ -93,9 +93,8 @@ final class process_generate_image_test extends \advanced_testcase {
     /**
      * Inject a MockHandler into the processor's $client property.
      *
-     * All HTTP calls in process_generate_image (agent creation, conversation,
-     * file download) go through $this->client, so a single MockHandler covers
-     * the full request sequence.
+     * All HTTP calls in process_generate_image go through $this->client,
+     * so a single MockHandler covers the full request sequence.
      *
      * @param process_generate_image $processor The processor to inject into.
      * @param Response[] $responses Ordered responses to queue.
