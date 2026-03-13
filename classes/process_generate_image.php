@@ -91,7 +91,7 @@ class process_generate_image extends abstract_processor {
             'description'     => get_string('action:generate_image:agentdescription', 'aiprovider_mistral'),
             'instructions'    => $this->get_system_instruction(),
             'tools'           => [['type' => 'image_generation']],
-            'completion_args' => array_filter([
+            'completion_args' => (object) array_filter([
                 'temperature' => $modelsettings['temperature'] ?? null,
                 'top_p'       => $modelsettings['top_p'] ?? null,
             ], fn($v) => $v !== null),
