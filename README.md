@@ -95,6 +95,27 @@ ai/provider/mistral/
 └── version.php
 ```
 
+## Tests
+
+Initialize the PHPUnit environment:
+
+```bash
+php public/admin/tool/phpunit/cli/init.php
+```
+
+Run specific tests:
+
+```bash
+vendor/bin/phpunit public/ai/provider/mistral/tests/...the_test_file.php
+```
+
+Run all plugin tests:
+
+```bash
+vendor/bin/phpunit --testsuite plugin
+```
+
+
 ## License
 
 This plugin is licensed under the [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html).
