@@ -52,7 +52,7 @@ final class provider_test extends \advanced_testcase {
      * Test get_action_list returns all supported actions.
      */
     public function test_get_action_list(): void {
-        $actionlist = provider::get_supported_actions();
+        $actionlist = provider::get_action_list();
 
         $this->assertIsArray($actionlist);
         $this->assertCount(4, $actionlist);
