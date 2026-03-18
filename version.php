@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'aiprovider_mistral';
-$plugin->version = 2026031300;
+$plugin->version = 2026031800;
 $plugin->requires = 2025030600;
-$plugin->release = '1.0.0';
+$plugin->release = '1.0.1';
 $plugin->maturity = MATURITY_STABLE;

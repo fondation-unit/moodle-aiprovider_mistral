@@ -93,6 +93,7 @@ final class process_summarise_text_test extends \advanced_testcase {
         $handlerstack = HandlerStack::create($mock);
         $client = new \GuzzleHttp\Client(['handler' => $handlerstack]);
 
+        // Inject the mocked client into the processor via reflection.
         $reflection = new \ReflectionClass(abstract_processor::class);
         $property = $reflection->getProperty('client');
         $property->setValue($processor, $client);
