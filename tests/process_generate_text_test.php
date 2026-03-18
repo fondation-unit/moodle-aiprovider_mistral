@@ -98,7 +98,7 @@ final class process_generate_text_test extends \advanced_testcase {
         $client = new \GuzzleHttp\Client(['handler' => $handlerstack]);
 
         // Inject the mocked client into the processor via reflection.
-        $reflection = new \ReflectionClass($processor);
+        $reflection = new \ReflectionClass(abstract_processor::class);
         $property = $reflection->getProperty('client');
         $property->setValue($processor, $client);
 
