@@ -11,7 +11,7 @@ A Moodle AI provider plugin that integrates [Mistral AI](https://mistral.ai) int
 
 ## Requirements
 
-- Moodle 4.5 or later
+- Moodle 5.0 or later
 - PHP 8.1 or later
 - A valid [Mistral AI API key](https://console.mistral.ai)
 
